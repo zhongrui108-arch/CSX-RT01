@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Support Journey — System Log Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ffffff;
+    --paper-2:#f6f7f3;
+    --paper-3:#eef1e9;
+    --ink:#1a1a1a;            /* near-black, headings/strong */
+    --body:#53565a;           /* Cool Gray 11 — body copy */
+    --muted:#75787b;          /* Cool Gray 9 — captions */
+    --line:#e6e6e6;           /* Deloitte Light Gray */
+    --line-2:#d0d0ce;         /* Cool Gray 2 */
+
+    --green:#86bc25;          /* Deloitte Green — brand + working */
+    --green-deep:#046a38;     /* Deep Green */
+    --green-mid:#3c8f2a;
+    --green-pale:#f1f6e4;     /* Pale Green */
+
+    --blue:#0076a8;           /* structural accent / data */
+    --blue-deep:#005587;
+    --blue-light:#62b5e5;
+    --teal:#0097a9;
+
+    --red:#da291c;            /* functional — pain/friction */
+    --red-pale:#fbe9e7;
+    --orange:#ed8b00;         /* functional — verify flag */
+    --orange-pale:#fdf0dd;
+
+    --maxw:760px;
+    --wide:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0;background:var(--paper);color:var(--body);
+    font-family:"Open Sans",system-ui,sans-serif;
+    font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .wide{max-width:var(--wide);margin:0 auto;padding:0 24px}
+
+  h1,h2,h3,h4{font-family:"Open Sans",sans-serif;color:var(--ink);line-height:1.2}
+  h1{font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(27px,3.8vw,38px);font-weight:800;margin:0 0 .2em;letter-spacing:-.015em}
+  h3{font-size:clamp(20px,2.3vw,26px);font-weight:700;margin:2.4em 0 .5em;letter-spacing:-.01em}
+  h4{font-size:17.5px;margin:1.8em 0 .4em;font-weight:700;color:var(--ink)}
+  p{margin:0 0 1.1em;color:var(--body)}
+  strong{color:var(--ink);font-weight:700}
+  a{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  em{color:var(--ink);font-style:italic}
+
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-deep)}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:84px 0 54px;border-bottom:1px solid var(--line)}
+  .hero .badge{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green-deep);background:var(--green-pale);border:1px solid #dce9c2;padding:6px 13px 6px 11px;border-radius:100px;margin-bottom:26px}
+  .hero .badge::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green)}
+  .hero h1{font-size:clamp(34px,6.6vw,64px);line-height:1.05;letter-spacing:-.025em;margin:0 0 .38em;color:var(--ink)}
+  .hero h1 .hl{background:linear-gradient(transparent 60%, var(--green) 60%);padding:0 .05em}
+  .hero .lede{font-size:clamp(18px,2.2vw,22px);line-height:1.5;color:var(--body);max-width:44ch;font-weight:400}
+  .hero .lede em{color:var(--ink)}
+  .metarow{display:flex;flex-wrap:wrap;gap:26px 48px;margin-top:42px;padding-top:26px;border-top:1px solid var(--line)}
+  .metarow .m{font-size:13.5px;line-height:1.4}
+  .metarow .m .k{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+  .metarow .m .v{color:var(--ink);font-weight:600}
+
+  /* ---------- STICKY ALTITUDE NAV ---------- */
+  .anav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .anav .inner{max-width:var(--wide);margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:6px;height:54px;overflow-x:auto}
+  .anav a{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--muted);border:none;padding:7px 12px;border-radius:7px;white-space:nowrap;text-transform:uppercase}
+  .anav a .n{color:var(--line-2);margin-right:6px;font-weight:700}
+  .anav a:hover{background:var(--paper-2);color:var(--ink)}
+  .anav a.on{background:var(--ink);color:#fff}
+  .anav a.on .n{color:var(--green)}
+
+  /* ---------- READING NOTE ---------- */
+  .note{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:48px 0}
+  .note h4{margin-top:0}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:14px 0 0;padding:0;list-style:none}
+  .legend li{font-size:13.5px;color:var(--body);display:flex;align-items:center;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:3px 11px 3px 9px;border-radius:100px;line-height:1.3;text-transform:uppercase;letter-spacing:.03em}
+  .chip::before{content:"";width:8px;height:8px;border-radius:50%}
+  .chip.pain{background:var(--red-pale);color:#a81f15}.chip.pain::before{background:var(--red)}
+  .chip.win{background:var(--green-pale);color:var(--green-deep)}.chip.win::before{background:var(--green)}
+  .chip.flag{background:var(--orange-pale);color:#9a5b00}.chip.flag::before{background:var(--orange)}
+
+  /* ---------- LEVEL SECTIONS ---------- */
+  .level{padding:74px 0 8px;scroll-margin-top:64px}
+  .level-head{border-top:3px solid var(--green);padding-top:18px;margin-bottom:8px}
+  .level-head .alt{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .level-head .lvlno{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-deep)}
+  .level-head .zoom{font-size:11.5px;color:var(--muted);letter-spacing:.04em;font-weight:600;text-transform:uppercase}
+  .level-head h2{margin-top:.2em}
+  .level-head .sub{font-size:18.5px;color:var(--body);max-width:56ch;margin:.2em 0 0;font-weight:400}
+
+  /* threaded strengths/pains block */
+  .thread{margin:26px 0 6px;border-left:4px solid var(--green);background:var(--paper-2);border-radius:0 12px 12px 0;padding:20px 24px}
+  .thread .lab{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .thread .row{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:680px){.thread .row{grid-template-columns:1fr;gap:18px}}
+  .thread ul{margin:0;padding:0;list-style:none}
+  .thread li{font-size:14.5px;line-height:1.5;color:var(--body);padding-left:20px;position:relative;margin-bottom:10px}
+  .thread li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:50%}
+  .thread .wins li::before{background:var(--green)}
+  .thread .pains li::before{background:var(--red)}
+  .thread .colhead{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:11px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.04em}
+  .thread .colhead .d{width:9px;height:9px;border-radius:50%}
+  .thread .wins .colhead .d{background:var(--green)}.thread .pains .colhead .d{background:var(--red)}
+
+  /* data callouts */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:30px 0}
+  @media(max-width:820px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.stat-grid{grid-template-columns:1fr}}
+  .stat{background:var(--paper);padding:22px 20px}
+  .stat .num{font-size:31px;font-weight:800;color:var(--green-deep);line-height:1.02;letter-spacing:-.02em}
+  .stat .lbl{font-size:12.5px;color:var(--body);margin-top:8px;line-height:1.45}
+  .stat .src{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:9px}
+
+  /* lifecycle steps */
+  .steps{margin:24px 0}
+  .step{display:grid;grid-template-columns:54px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .step:last-child{border-bottom:none}
+  .step .idx{font-size:27px;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
+  .step.enf .idx{color:var(--red)}
+  .step h4{margin:0 0 .25em}
+  .step.enf h4{color:var(--red)}
+  .step p{margin:0;font-size:15px}
+  .step .meta{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:8px;letter-spacing:.01em}
+  .stagemap{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green-deep);background:var(--green-pale);border-radius:5px;padding:3px 8px;margin-top:9px}
+
+  /* archetype cards */
+  .arch{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}
+  @media(max-width:820px){.arch{grid-template-columns:1fr}}
+  .acard{border:1px solid var(--line);border-top:3px solid var(--green);border-radius:0 0 14px 14px;padding:22px;background:var(--paper)}
+  .acard .nm{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--ink);letter-spacing:-.01em}
+  .acard .tag{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.03em;margin-bottom:14px;text-transform:uppercase}
+  .acard dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 12px}
+  .acard dt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:2px}
+  .acard dd{margin:0;font-size:13.5px;color:var(--body)}
+  .acard .ex{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);font-size:13px;color:var(--body)}
+  .acard .ex strong{color:var(--ink)}
+
+  .modelbar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  @media(max-width:680px){.modelbar{grid-template-columns:1fr}}
+  .mb{border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:14px 16px;background:var(--paper-2)}
+  .mb .h{font-weight:700;font-size:14px;margin-bottom:3px;color:var(--ink)}
+  .mb .d{font-size:13px;color:var(--body)}
+  .mb .s{font-size:11px;font-weight:600;color:var(--muted);margin-top:8px;letter-spacing:.01em}
+
+  /* SERVICE BLUEPRINT */
+  .bp-scroll{overflow-x:auto;margin:24px -24px;padding:0 24px;-webkit-overflow-scrolling:touch}
+  .bp{min-width:880px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+  .bp .prow{display:grid;grid-template-columns:152px repeat(6,1fr)}
+  .bp .prow.path{background:var(--paper-3)}
+  .bp .cell{padding:12px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.42;color:var(--body)}
+  .bp .cell:last-child{border-right:none}
+  .bp .prow:last-child .cell{border-bottom:none}
+  .bp .lane{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);background:var(--paper-2);display:flex;flex-direction:column;justify-content:center}
+  .bp .lane .ll{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px;margin-top:3px}
+  .bp .stagecell{background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.02em;text-align:center;display:flex;align-items:center;justify-content:center}
+  .bp .stagecell.enf{background:var(--red)}
+  .bp .pathlab{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .bp .happy{color:var(--green-deep)}
+  .bp .excp{color:var(--red)}
+  .bp .emo{background:var(--green-pale)}
+  .bp .emo .cell:not(.lane){font-style:italic;color:var(--ink)}
+  .bp .emo .lane{background:var(--green-deep);color:#fff}
+  .bp .emo .lane .ll{color:#dff0c9}
+  .emoscale{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--muted);margin-top:10px;letter-spacing:.02em;text-transform:uppercase}
+  .scrollhint{font-size:11px;font-weight:600;color:var(--muted);margin:0;letter-spacing:.02em;text-transform:uppercase}
+
+  /* stakeholder list */
+  .stk{margin:24px 0}
+  .stk .grp{border-top:1px solid var(--line);padding:16px 0}
+  .stk .grp .gh{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-deep);margin-bottom:12px}
+  .stk .items{display:flex;flex-wrap:wrap;gap:8px}
+  .stk .it{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink)}
+  .stk .it span{color:var(--muted);font-size:11px;font-weight:400;display:block;letter-spacing:.01em;margin-top:1px}
+  .stk .it.absent{border-style:dashed;border-color:var(--line-2);background:var(--paper-2)}
+
+  /* procedural justice */
+  .pj{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+  @media(max-width:680px){.pj{grid-template-columns:1fr}}
+  .pjc{border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .pjc .q{font-weight:700;font-size:15px;margin-bottom:5px;color:var(--ink)}
+  .pjc .a{font-size:13.5px;color:var(--body)}
+
+  blockquote{margin:22px 0;padding:6px 0 6px 22px;border-left:4px solid var(--green);font-style:italic;font-size:19px;line-height:1.5;color:var(--ink);font-weight:400}
+  blockquote .who{display:block;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--muted);margin-top:11px;text-transform:uppercase}
+
+  /* emotional registers */
+  .feel{margin:22px 0}
+  .feel .f{display:grid;grid-template-columns:168px 1fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+  @media(max-width:600px){.feel .f{grid-template-columns:1fr;gap:6px}}
+  .feel .f:last-child{border-bottom:none}
+  .feel .who{font-weight:700;font-size:15px;color:var(--ink)}
+  .feel .who .role{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-top:3px}
+  .feel .reg{font-size:14.5px;color:var(--body)}
+  .feel .reg .why{display:block;font-size:13px;color:var(--muted);margin-top:6px}
+
+  /* scorecard */
+  .score{width:100%;border-collapse:collapse;margin:24px 0;font-size:13.5px}
+  .score th,.score td{text-align:left;padding:14px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .score thead th{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--line-2)}
+  .score .lv{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green-deep);white-space:nowrap}
+  .score td.w,.score td.p{color:var(--body)}
+  .score td.w .d,.score td.p .d{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  .score td.w .d{background:var(--green)}.score td.p .d{background:var(--red)}
+
+  /* opportunity */
+  .opp{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+  @media(max-width:680px){.opp{grid-template-columns:1fr}}
+  .oc{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+  .oc .t{font-weight:700;font-size:15px;margin-bottom:5px;color:var(--ink)}
+  .oc .d{font-size:13.5px;color:var(--body)}
+  .oc .lever{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green-deep);margin-bottom:9px}
+
+  /* sources */
+  .src-block{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:24px 0}
+  .src-block h4{margin-top:0}
+  .src-block ul{margin:0 0 1em;padding-left:18px}
+  .src-block li{font-size:13.5px;color:var(--body);margin-bottom:6px}
+  .src-block .flagnote{font-size:13px;color:var(--body);background:var(--orange-pale);border:1px solid #f0d8a6;border-radius:10px;padding:13px 16px;margin-top:6px}
+
+  .pull{font-size:clamp(21px,2.5vw,26px);line-height:1.38;color:var(--ink);font-weight:700;margin:30px 0;letter-spacing:-.015em}
+  .pull .hl{background:linear-gradient(transparent 58%, var(--green) 58%)}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:40px 0 70px}
+  footer .f{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">Child Support Journey Lab · System Log Report</span>
+    <h1>A system built to <span class="hl">recover money</span>, serving families who need a&nbsp;service.</h1>
+    <p class="lede">The U.S. child support program runs on enforcement machinery designed in 1975 to reimburse the government for welfare. In 2026, most of the families it touches need something different: a process that is <em>legible, dignified, and humane</em>. This report maps the whole system — from the macro structure down to what a single parent feels at the counter.</p>
+    <div class="metarow">
+      <div class="m"><span class="k">Prepared for</span><span class="v">SCADpro Foundry × Deloitte GPS</span></div>
+      <div class="m"><span class="k">Spine</span><span class="v">Macro → Meso → Micro</span></div>
+      <div class="m"><span class="k">Scope</span><span class="v">Service-provider & family side</span></div>
+      <div class="m"><span class="k">Evidence</span><span class="v">Project corpus + federal & academic sources</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ALTITUDE NAV -->
+<nav class="anav" aria-label="Report levels">
+  <div class="inner">
+    <a href="#read"><span class="n">·</span>How to read</a>
+    <a href="#macro"><span class="n">01</span>Macro · System</a>
+    <a href="#meso"><span class="n">02</span>Meso · Service</a>
+    <a href="#micro"><span class="n">03</span>Micro · Person</a>
+    <a href="#scorecard"><span class="n">04</span>Scorecard</a>
+    <a href="#opportunity"><span class="n">05</span>Opportunity</a>
+    <a href="#sources"><span class="n">·</span>Sources</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- HOW TO READ -->
+  <section id="read" class="note reveal" style="scroll-margin-top:64px">
+    <h4>How to read this report</h4>
+    <p style="margin-bottom:.6em">It descends through three altitudes. <strong>Macro</strong> is the system — law, money, and structure. <strong>Meso</strong> is the service — the lifecycle, the state variations, the blueprint. <strong>Micro</strong> is the person — what a parent actually experiences and feels. At every altitude, what is working and what is failing sit side by side rather than in separate chapters.</p>
+    <ul class="legend">
+      <li><span class="chip win">working</span> a genuine strength of the system as it stands</li>
+      <li><span class="chip pain">friction</span> a pain point or barrier</li>
+      <li><span class="chip flag">verify</span> a striking figure sourced from vendor marketing — cross-check before citing</li>
+    </ul>
+  </section>
+
+  <!-- ===================== MACRO ===================== -->
+</main>
+<section id="macro" class="level"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Level 01</span><span class="zoom">zoom: 100,000 ft · the system</span></div>
+    <h2>Macro — the system</h2>
+    <p class="sub">Who runs it, who pays for it, what it was built to do, and the gap between that mission and the families standing in front of it today.</p>
+  </div>
+
+  <h3>A federal–state–tribal machine</h3>
+  <p>Child support is a single federal program delivered in dozens of different ways. The federal Office of Child Support Services (OCSS, within HHS / Administration for Children and Families) sets the rules, funds the bulk of the cost, audits performance, and operates the national locate tools — but it does not serve a single family directly. Delivery happens locally. <strong>All 50 states plus the District of Columbia, Guam, Puerto Rico, and the U.S. Virgin Islands operate programs, generally at the county level, and roughly 60 tribal nations run their own programs</strong> under tribal law and tribal courts.</p>
+  <p>Two structural facts shape everything downstream. First, Washington reimburses states at a <strong>66% open-ended federal match</strong> and layers performance incentives on top under §458 of the Social Security Act — and those incentives reward five throughput metrics (paternity established, orders established, current collections, arrears collections, cost-effectiveness), not whether anyone felt treated fairly. Second, because actual delivery is local, <em>"it depends on the state"</em> is the honest answer to almost every question a family asks — which is itself a structural barrier, not a footnote.</p>
+
+  <h3>An identity it has never resolved</h3>
+  <p>The program was created in 1975 as a <strong>cost-recovery mechanism</strong> — a way to repay the government for welfare paid to single-mother families. That origin is still wired into the machinery. The clearest symptom is at the top: the federal office renamed itself from the Office of Child Support <em>Enforcement</em> to the Office of Child Support <em>Services</em> in June 2023, then back to <em>Enforcement</em> in December 2025. "Enforcement" evokes policing and shame; "services" signals help. An institution that cannot keep its own name has not decided whether its relationship to a parent is adversarial or supportive — and every downstream artifact (letter tone, portal language, enforcement triggers, caseworker scripts) inherits that unresolved question.</p>
+
+  <p class="pull">The program was engineered for a population that is now the <span class="hl">minority</span> of who it serves.</p>
+
+  <h3>Built for 1975, serving 2026</h3>
+  <p>The caseload has quietly inverted. The enforcement-first design assumes a welfare-linked family — but today only about <strong>7% of cases are current-TANF and 38% formerly TANF; 55% have no welfare connection at all</strong>. Meanwhile, roughly half of custodial parents never pursue an order — the most common reasons being that they "did not feel the need to make it legal" or that "the other parent provides what he or she can." Families are opting out because informal arrangements already work for them, which means the system's biggest signal is often <em>who it is losing</em>.</p>
+
+  <h3>The numbers that frame the brief</h3>
+  <div class="stat-grid reveal">
+    <div class="stat"><div class="num">71%</div><div class="lbl">of all collections move invisibly through automatic income withholding from employers</div><div class="src">FY2024 · OCSS Table P-29</div></div>
+    <div class="stat"><div class="num">$26.65B</div><div class="lbl">distributed in collections; ~97% reached families</div><div class="src">FY2024 · OCSS</div></div>
+    <div class="stat"><div class="num">$10.7B</div><div class="lbl">gap between support owed ($29.9B) and received ($19.2B)</div><div class="src">2022 · Census P60-285</div></div>
+    <div class="stat"><div class="num">$115.7B</div><div class="lbl">in arrears owed — only ~6.5% collected in a given year</div><div class="src">FY2024 · OCSS</div></div>
+    <div class="stat"><div class="num">$4.24</div><div class="lbl">collected per $1 spent — down from $5.51 in FY2020, a 23% efficiency slide</div><div class="src">FY2020→FY2024 · OCSS</div></div>
+    <div class="stat"><div class="num">$807.8M</div><div class="lbl">of collected support retained by government as assistance reimbursement</div><div class="src">FY2024 · Table P-1 (State $356.0M + Fed $451.9M)</div></div>
+    <div class="stat"><div class="num">41%</div><div class="lbl">of custodial parents received the full amount owed; 75.5% received at least some</div><div class="src">2022 · Census P60-285</div></div>
+    <div class="stat"><div class="num">~42%</div><div class="lbl">share of household income that child support represents for families who receive it</div><div class="src">Annie E. Casey / CBPP</div></div>
+  </div>
+
+  <h3>The line you can move — and the line you cannot</h3>
+  <p>A strategic distinction runs through the whole project: <strong>which pains are design problems your team can redesign, and which are policy problems set in statute.</strong> The order-amount formula (e.g., Georgia O.C.G.A. § 19-6-15), the enforcement tools (income withholding, tax-refund intercept, license suspension, passport denial, bank levy, liens, civil contempt), and the rule that government-owed arrears cannot be forgiven without a federal waiver are the fixed legal core. But letter tone, portal architecture, phone-tree design, caseworker tooling, notification channels, payment UX, and the <em>explanation</em> of how a number was reached are all design surfaces — and that is where nearly all the felt cost lives.</p>
+
+  <div class="thread reveal">
+    <div class="lab">Threaded at the macro level — what's working / what's failing</div>
+    <div class="row">
+      <div class="wins"><div class="colhead"><span class="d"></span>Working</div>
+        <ul>
+          <li>The federal locate infrastructure (FPLS, National Directory of New Hires, Federal Case Registry) is genuinely powerful — it can find a parent, employer, and income across state lines.</li>
+          <li>Income withholding carries 71% of all dollars reliably and invisibly, with no friction for the family on the happy path.</li>
+          <li>A 66% federal match gives states real capacity to deliver a service at scale.</li>
+        </ul>
+      </div>
+      <div class="pains"><div class="colhead"><span class="d"></span>Failing</div>
+        <ul>
+          <li>Fragmentation: "it depends on the state" fractures every cross-state journey and makes the program illegible nationally.</li>
+          <li>The §458 incentives reward throughput and dollars, not fairness — so the funding formula structurally discourages "sitting with the person."</li>
+          <li>Cost-recovery retention diverts $807.8M of paid support away from families to government — the single most legitimacy-destroying hidden step.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+  <!-- ===================== MESO ===================== -->
+<section id="meso" class="level"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Level 02</span><span class="zoom">zoom: 1,000 ft · the service</span></div>
+    <h2>Meso — the service</h2>
+    <p class="sub">How the program actually operates: the case lifecycle, the way it differs from state to state, the blueprint of who does what, and the people in the room.</p>
+  </div>
+
+  <h3>The case lifecycle — nine steps</h3>
+  <p>Every case moves through some path across nine steps. Many cases skip steps or loop back (a closed-looking case returns to <em>modify</em> years later). The green tags map each step onto the six journey stages your project is organized around. Step 6 is set apart because it is where the program's human cost concentrates.</p>
+
+  <div class="steps reveal">
+    <div class="step"><div class="idx">1</div><div><h4>Intake / application / referral</h4><p>A parent applies voluntarily (a one-time $25 fee) or a public-assistance case is auto-referred from TANF/Medicaid with no choice. The state agency opens the case and assigns a caseworker.</p><div class="meta">Actors: custodial parent · agency &nbsp;|&nbsp; Branch: voluntary vs. mandatory · paternity already established?</div><span class="stagemap">Stage · Case initiation</span></div></div>
+    <div class="step"><div class="idx">2</div><div><h4>Locate</h4><p>Find the other parent, their employer, income, and assets — often across state lines.</p><div class="meta">Systems: FPLS · National Directory of New Hires · Federal Case Registry</div><span class="stagemap">Stage · Locate</span></div></div>
+    <div class="step"><div class="idx">3</div><div><h4>Establish paternity</h4><p>Required for non-marital cases before an order can issue. Voluntary Acknowledgment at the birth hospital, or court-ordered genetic testing if contested.</p><div class="meta">Actors: parents · hospital · vital records · courts</div><span class="stagemap">Stage · Establishment</span></div></div>
+    <div class="step"><div class="idx">4</div><div><h4>Establish the order</h4><p>The state's guideline calculates the amount; a court (or the agency administratively) issues a formal order. Income is <em>imputed</em> if the non-custodial parent doesn't appear.</p><div class="meta">Branch: present vs. absent · income documented vs. imputed · medical support included?</div><span class="stagemap">Stage · Establishment</span></div></div>
+    <div class="step"><div class="idx">5</div><div><h4>Collect &amp; disburse</h4><p>An Income Withholding Order goes to the employer → employer remits to the State Disbursement Unit → SDU pays the family. This is the invisible "happy path" for most dollars.</p><div class="meta">Actors: employer · SDU · banks &nbsp;|&nbsp; Branch: employed vs. self-employed/unbanked</div><span class="stagemap">Stage · Financials</span></div></div>
+    <div class="step enf"><div class="idx">6</div><div><h4>Enforce — when payment lapses</h4><p>The agency escalates: tax-refund intercept, credit reporting, driver's / professional / recreational license suspension, passport denial, bank levy, liens, and civil contempt (which can mean jail). This is the exception path — and where almost all felt pain lives.</p><div class="meta">Branch: which tool first? · notice given? · ability-to-pay screened? · is suspension counterproductive?</div><span class="stagemap">Stage · Enforcement</span></div></div>
+    <div class="step"><div class="idx">7</div><div><h4>Modify</h4><p>Review is mandatory every three years for TANF cases; otherwise either party must request it and prove a "substantial change in circumstances." Rarely proactive.</p><div class="meta">Branch: job loss / incarceration / illness? · who initiated? · reviewed proactively?</div><span class="stagemap">Stage · Case management</span></div></div>
+    <div class="step"><div class="idx">8</div><div><h4>Distribute</h4><p>Where the money goes. Non-TANF families get 100%; current/former-TANF collections may be retained to reimburse government. Pass-through and arrears rules vary sharply by state.</p><div class="meta">Branch: TANF status? · state pass-through policy? · arrears vs. current support</div><span class="stagemap">Stage · Financials</span></div></div>
+    <div class="step"><div class="idx">9</div><div><h4>Close</h4><p>The child reaches majority, arrears are satisfied, or other statutory criteria are met. The case can stay open for years if arrears remain.</p><div class="meta">Branch: outstanding arrears? · still a minor? · CP requested closure?</div><span class="stagemap">Stage · Case management</span></div></div>
+  </div>
+
+  <h3>Why "it depends on the state" — three process archetypes</h3>
+  <p>The nine-step skeleton is federally mandated, so it is the same everywhere. What varies sits on three axes: the <strong>guideline model</strong> (how the amount is calculated), the <strong>administration model</strong> (who runs it — state agency, county, or courts), and the <strong>distribution model</strong> (whether the family or the government gets the money first). Clustering states into three archetypes makes the variation legible without memorizing fifty-four programs.</p>
+
+  <div class="arch reveal">
+    <div class="acard">
+      <div class="nm">The Texas archetype</div>
+      <div class="tag">obligor-focused · state-run · cost-recovery</div>
+      <dl>
+        <dt>Guideline</dt><dd>Percentage-of-income (varying) — only the paying parent's income counts</dd>
+        <dt>Admin</dt><dd>Centralized, state-run through the Office of the Attorney General</dd>
+        <dt>Distribution</dt><dd>Minimal pass-through; cost-recovery posture</dd>
+      </dl>
+      <div class="ex"><strong>Largest program in the U.S.:</strong> ~1.5M cases, ~$4.5B collected annually, serving roughly 1 in 4 Texas children. <em>Peers: WI, NV, ND (also percentage-of-income).</em></div>
+    </div>
+    <div class="acard">
+      <div class="nm">The California archetype</div>
+      <div class="tag">both-incomes · county-run · family-first</div>
+      <dl>
+        <dt>Guideline</dt><dd>Income-shares — both parents' incomes combined and pro-rated</dd>
+        <dt>Admin</dt><dd>County-administered local agencies under a state department</dd>
+        <dt>Distribution</dt><dd>DRA "family-first" distribution; full assigned-arrears pass-through live since May 2024</dd>
+      </dl>
+      <div class="ex"><strong>The reform direction:</strong> moving money toward families first. <em>Peers in spirit: CO, MI, IL, MN (full or near-full pass-through).</em></div>
+    </div>
+    <div class="acard">
+      <div class="nm">The Georgia archetype</div>
+      <div class="tag">both-incomes · state-run · fill-the-gap</div>
+      <dl>
+        <dt>Guideline</dt><dd>Income-shares (O.C.G.A. § 19-6-15)</dd>
+        <dt>Admin</dt><dd>State-administered</dd>
+        <dt>Distribution</dt><dd>"Fill-the-gap" cost-recovery — one of only five grandfathered states</dd>
+      </dl>
+      <div class="ex"><strong>The retain-first model:</strong> families on assistance see support absorbed before they do. <em>Peers: DE, ME, SC, TN (the five fill-the-gap states).</em></div>
+    </div>
+  </div>
+
+  <div class="modelbar reveal">
+    <div class="mb"><div class="h">Income shares</div><div class="d">Combines both parents' incomes; the child gets the share they'd have received intact. The default nearly everywhere.</div><div class="s">~41 states + 2 territories · incl. CA, GA, FL, NY, OH</div></div>
+    <div class="mb"><div class="h">Percentage of income</div><div class="d">A percentage of the paying parent's income only — flat or varying. Simpler, but ignores the receiving parent's means.</div><div class="s">6 states · flat: WI, NV, MS, AK · varying: TX, ND</div></div>
+    <div class="mb"><div class="h">Melson formula</div><div class="d">An income-shares variant that secures each parent's own basic needs first via a self-support reserve.</div><div class="s">3 states · DE, HI, MT &nbsp;(DC uses a hybrid)</div></div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">A fourth model worth naming for your project: <strong style="color:var(--ink)">tribal programs</strong> (~60 nations) are genuinely distinct — smaller, community-embedded, operating under tribal courts and able to recognize non-cash and in-kind support that the formal state system cannot. They are the clearest example of a humane delivery model already operating inside the same federal frame.</p>
+
+  <h3>The service blueprint — with the emotion baked in</h3>
+  <p>A deliberately simple blueprint. Read it left to right across the lifecycle, top to bottom through the lanes: what the family does (frontstage), what the agency and systems do out of view (backstage), the support actors who never show their face, and — woven in as its own lane — what the parent <em>feels</em> at each stage. Two paths run through it: the invisible <strong style="color:var(--green-deep)">happy path</strong> where withholding just works, and the <strong style="color:var(--red)">exception path</strong> where enforcement begins and the felt experience collapses.</p>
+  <p class="scrollhint">→ scroll the blueprint sideways on a narrow screen</p>
+  <div class="bp-scroll reveal">
+    <div class="bp">
+      <div class="prow">
+        <div class="cell lane">Stage</div>
+        <div class="cell stagecell">1 · Intake</div>
+        <div class="cell stagecell">2–4 · Locate &amp; establish</div>
+        <div class="cell stagecell">5 · Collect &amp; disburse</div>
+        <div class="cell stagecell enf">6 · Enforce</div>
+        <div class="cell stagecell">7 · Modify</div>
+        <div class="cell stagecell">8–9 · Distribute &amp; close</div>
+      </div>
+      <div class="prow">
+        <div class="cell lane">Frontstage<span class="ll">what the family does</span></div>
+        <div class="cell">Applies or is auto-referred; first interview</div>
+        <div class="cell">Supplies information; may attend a hearing</div>
+        <div class="cell">Receives (or waits for) payment</div>
+        <div class="cell">Receives notices; summoned to court</div>
+        <div class="cell">Must request a change &amp; prove it</div>
+        <div class="cell">Money arrives or is retained; case lingers</div>
+      </div>
+      <div class="prow">
+        <div class="cell lane">Backstage<span class="ll">agency &amp; systems</span></div>
+        <div class="cell">Case opened on legacy system; worker assigned</div>
+        <div class="cell">Locate tools run; guideline applied; order issued</div>
+        <div class="cell">IWO sent; payments posted</div>
+        <div class="cell">Tool selected; contempt petition filed</div>
+        <div class="cell">3-yr review (TANF) or on request</div>
+        <div class="cell">Distribution rules applied; closure check</div>
+      </div>
+      <div class="prow">
+        <div class="cell lane">Support<span class="ll">invisible actors</span></div>
+        <div class="cell">TANF/Medicaid referral source</div>
+        <div class="cell">FPLS · NDNH · hospital · court</div>
+        <div class="cell">Employer · State Disbursement Unit</div>
+        <div class="cell">IRS · DMV · passport · banks · credit bureaus · court</div>
+        <div class="cell">Court · employer</div>
+        <div class="cell">SDU · state treasury</div>
+      </div>
+      <div class="prow path">
+        <div class="cell lane">Path</div>
+        <div class="cell"><span class="pathlab happy">happy →</span> &amp; <span class="pathlab excp">exception</span> diverge here</div>
+        <div class="cell"><span class="pathlab happy">order set fairly</span></div>
+        <div class="cell"><span class="pathlab happy">withholding works · invisible</span></div>
+        <div class="cell"><span class="pathlab excp">withholding fails · pain concentrates</span></div>
+        <div class="cell"><span class="pathlab excp">order outpaces ability to pay</span></div>
+        <div class="cell"><span class="pathlab happy">family paid</span> / <span class="pathlab excp">govt retains</span></div>
+      </div>
+      <div class="prow emo">
+        <div class="cell lane">Emotion<span class="ll">how the parent feels</span></div>
+        <div class="cell">Exposed, unsure what they're agreeing to</div>
+        <div class="cell">Unheard — decisions made without them</div>
+        <div class="cell">Hope ↔ disappointment with each cycle</div>
+        <div class="cell">Fear, shame, "treated like a criminal"</div>
+        <div class="cell">Trapped — debt grows faster than recourse</div>
+        <div class="cell">Betrayed when paid support never arrives</div>
+      </div>
+    </div>
+  </div>
+  <div class="emoscale">emotional baseline: &nbsp;<span style="color:var(--green-deep)">neutral / hopeful</span> &nbsp;———▼———&nbsp; <span style="color:var(--red)">distress concentrated at enforcement</span></div>
+
+  <h3>The people in the room — stakeholder list</h3>
+  <p>A roster rather than a full ecosystem map (that comes later). Grouped by the role each plays in the service.</p>
+  <div class="stk reveal">
+    <div class="grp">
+      <div class="gh">Primary — the four who carry the experience</div>
+      <div class="items">
+        <div class="it">Custodial parent<span>the nominal client · ~80% women</span></div>
+        <div class="it">Non-custodial parent<span>the enforcement target · ~90% men</span></div>
+        <div class="it">Agency caseworker<span>front-line, overloaded</span></div>
+        <div class="it absent">The child<span>stated beneficiary · no seat at the table</span></div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="gh">Institutional — set the rules & move the money</div>
+      <div class="items">
+        <div class="it">OCSS / ACF (HHS)<span>federal rules, funding, audit</span></div>
+        <div class="it">State / county IV-D agency<span>delivers the program</span></div>
+        <div class="it">Tribal IV-D programs<span>~60 · tribal law & courts</span></div>
+        <div class="it">Courts & magistrates<span>orders, modification, contempt</span></div>
+        <div class="it">State Disbursement Unit<span>processes every payment</span></div>
+        <div class="it">Employers<span>income withholding, new-hire reporting</span></div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="gh">Enforcement instruments — the leverage</div>
+      <div class="items">
+        <div class="it">IRS / Treasury<span>federal tax-refund intercept</span></div>
+        <div class="it">State tax agencies<span>state refund intercept</span></div>
+        <div class="it">DMV / licensing boards<span>license suspension</span></div>
+        <div class="it">State Dept. (passport)<span>passport denial</span></div>
+        <div class="it">Banks<span>levies, financial data match</span></div>
+        <div class="it">Credit bureaus<span>arrears reporting</span></div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="gh">Project-relevant — recruitment & warm intros</div>
+      <div class="items">
+        <div class="it">NCSEA<span>national association · warm-intro path</span></div>
+        <div class="it">Deloitte GPS POCs<span>brand partner · BD pipeline states</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="thread reveal">
+    <div class="lab">Threaded at the meso level — what's working / what's failing</div>
+    <div class="row">
+      <div class="wins"><div class="colhead"><span class="d"></span>Working</div>
+        <ul>
+          <li>Income withholding is the single most effective collection method ever built — reliable, automatic, low-friction.</li>
+          <li>Voluntary paternity acknowledgment at the hospital is a quiet, well-designed success.</li>
+          <li>Evidence-backed bright spots exist: procedural-justice casework (PJAC) and employment-first models (CSPED) measurably raise fairness and satisfaction; portal modernization (Idaho Nexi, Conduent THRIVE) cuts caseworker load.</li>
+        </ul>
+      </div>
+      <div class="pains"><div class="colhead"><span class="d"></span>Failing</div>
+        <ul>
+          <li>Legacy mainframes — some 30+ years old — force caseworkers to re-key the same data across systems <span class="chip flag">verify</span>.</li>
+          <li>Orders are often set above ability to pay; in ~55% of low-income CSPED cases the order exceeded half of earnings.</li>
+          <li>Modification is reactive: orders aren't reviewed automatically when a parent loses a job or is incarcerated, so debt compounds.</li>
+          <li>Wide judicial discretion produces wildly inconsistent outcomes — the same facts yield jail in one courtroom and patience in another.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+  <!-- ===================== MICRO ===================== -->
+<section id="micro" class="level"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Level 03</span><span class="zoom">zoom: ground level · the person</span></div>
+    <h2>Micro — the person</h2>
+    <p class="sub">What it feels like from inside the system. The emotional curve from the blueprint, opened up into lived experience — and the one thing that reliably earns trust.</p>
+  </div>
+
+  <h3>The four questions a parent is really asking</h3>
+  <p>Procedural-justice research (notably MDRC's PJAC demonstration) shows that people cooperate with an outcome they dislike <em>if the process felt fair</em> — and fairness reduces to four questions. They double as a design rubric: score every touchpoint against them.</p>
+  <div class="pj reveal">
+    <div class="pjc"><div class="q">Voice — "Was I heard?"</div><div class="a">Parents want to explain their situation <em>before</em> a decision, not after enforcement starts. Orders are still set in their absence through imputed-income proceedings.</div></div>
+    <div class="pjc"><div class="q">Neutrality — "Was it even-handed?"</div><div class="a">Consistent rules applied the same way to everyone — undercut by judicial discretion and a structure that points the enforcement apparatus at only one parent.</div></div>
+    <div class="pjc"><div class="q">Respect — "Was I treated with dignity?"</div><div class="a">The single most-cited non-custodial theme: being treated "like a criminal" rather than a parent trying to provide.</div></div>
+    <div class="pjc"><div class="q">Trust — "Did I understand it?"</div><div class="a">Opacity reads as arbitrariness. A parent who can't see how a number was reached can't experience it as fair, even when it's legally correct.</div></div>
+  </div>
+
+  <blockquote>I'm talking to Molly instead of talking to child support.<span class="who">Non-custodial parent · MDRC PJAC parent reflections</span></blockquote>
+  <p>That sentence is the whole finding. Trust attaches to a <strong>named, reachable human</strong> — "Molly" — not to an institution. In live agency reviews, the rare five-star ratings almost always credit one specific caseworker by name. The corresponding failure is just as concrete: "the people who answer the phone are not necessarily putting you in touch with that person."</p>
+
+  <h3>How each stakeholder feels — and why</h3>
+  <div class="feel reveal">
+    <div class="f">
+      <div class="who">Custodial parent<span class="role">priority 1 · the client</span></div>
+      <div class="reg">Exhausted, distrustful of promises, financially precarious — hope and disappointment cycling with each missed payment.<span class="why">Why: sporadic/partial payments, opaque case status, re-traumatizing intake, and the sense of being an afterthought in a process nominally about her own child.</span></div>
+    </div>
+    <div class="f">
+      <div class="who">Non-custodial parent<span class="role">priority 2 · the target</span></div>
+      <div class="reg">Alienated, ashamed, fearful of jail or losing a license — bitterness at a system read as structurally against him.<span class="why">Why: orders above ability to pay, a debt spiral that survives even incarceration, no link between paying and seeing the child, and enforcement letters that drive withdrawal rather than payment (the "turtle effect").</span></div>
+    </div>
+    <div class="f">
+      <div class="who">Caseworker<span class="role">priority 3 · front line</span></div>
+      <div class="reg">Overwhelmed, morally strained — often genuine care colliding with an enforcement mandate.<span class="why">Why: large, randomly-assigned caseloads on aging tools, pushed toward "process the case" by metrics that count throughput, not whether a parent felt heard.</span></div>
+    </div>
+    <div class="f">
+      <div class="who">The child<span class="role">priority 4 · absent</span></div>
+      <div class="reg">No recorded voice at all.<span class="why">Why: the stated beneficiary of the entire system, yet no data is collected from the child's perspective. Naming this absence is often the sharpest insight in a child-support redesign.</span></div>
+    </div>
+  </div>
+
+  <h3>The dimension that runs through all four</h3>
+  <p>Race cannot be treated as a subtheme. Black non-custodial parents are dramatically overrepresented in contempt and incarceration outcomes; in the CSPED sample, 40% of non-custodial parents were Black and 65% had been incarcerated. The mechanism is wide judicial discretion — the same facts producing radically different outcomes depending on the judge. Agency staffing has historically not reflected the communities served, compounding the gap on every procedural-justice dimension at once.</p>
+
+  <div class="thread reveal">
+    <div class="lab">Threaded at the micro level — what's working / what's failing</div>
+    <div class="row">
+      <div class="wins"><div class="colhead"><span class="d"></span>Working</div>
+        <ul>
+          <li>One thing reliably earns trust: a named, reachable caseworker who explains a decision <em>before</em> it's issued. PJAC case managers who gave out direct numbers let parents bypass the phone queue entirely.</li>
+          <li>When human attention rises, so does perceived fairness — CSPED's extra-services group reported 68% "treated fairly" vs. 53%, on ~3.7× the contact hours.</li>
+          <li>Removing the most punitive step barely dents collections: PJAC cut civil-contempt filings ~60 points with negligible payment loss.</li>
+        </ul>
+      </div>
+      <div class="pains"><div class="colhead"><span class="d"></span>Failing</div>
+        <ul>
+          <li>Opacity-as-arbitrariness: parents can't decode how the order or the arrears were calculated, so even correct numbers feel unjust.</li>
+          <li>No dedicated, reachable caseworker for most parents; status is invisible; court dates and enforcement actions arrive without notice.</li>
+          <li>Shame and fear actively suppress payment — the system's tone works against its own goal.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+  <!-- ===================== SCORECARD ===================== -->
+<section id="scorecard" class="level"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Level 04</span><span class="zoom">synthesis · at a glance</span></div>
+    <h2>Consolidated scorecard</h2>
+    <p class="sub">The same working/failing picture, pulled into one view across all three altitudes — the version to bring to class.</p>
+  </div>
+  <table class="score reveal">
+    <thead><tr><th>Level</th><th>What's working</th><th>What's not working</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="lv">Macro<br>system</td>
+        <td class="w"><span class="d"></span>Powerful federal locate tools; income withholding moves 71% of dollars; 66% match funds delivery at scale</td>
+        <td class="p"><span class="d"></span>State fragmentation; incentives reward throughput over fairness; $807.8M of support retained from families</td>
+      </tr>
+      <tr>
+        <td class="lv">Meso<br>service</td>
+        <td class="w"><span class="d"></span>Withholding &amp; hospital paternity work well; PJAC, CSPED &amp; portal modernization are proven bright spots</td>
+        <td class="p"><span class="d"></span>30-yr-old legacy tools; orders above ability to pay; reactive modification; inconsistent judicial outcomes</td>
+      </tr>
+      <tr>
+        <td class="lv">Micro<br>person</td>
+        <td class="w"><span class="d"></span>A named, reachable caseworker reliably builds trust; more human contact raises perceived fairness</td>
+        <td class="p"><span class="d"></span>Opacity feels arbitrary; no reachable caseworker; no notice; shame &amp; fear suppress the very payment sought</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="pull">Strip out the most punitive, costly step and you lose almost nothing in collections — while the <span class="hl">harm and the cost both fall.</span></p>
+</div></section>
+
+  <!-- ===================== OPPORTUNITY ===================== -->
+<section id="opportunity" class="level"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Level 05</span><span class="zoom">downstream · not the focus yet</span></div>
+    <h2>Opportunity space</h2>
+    <p class="sub">Kept deliberately light. These are the highest-legitimacy, lowest-cost design levers the evidence already supports — flagged for later, not the current phase.</p>
+  </div>
+  <div class="opp reveal">
+    <div class="oc"><div class="lever">lever · respect + trust</div><div class="t">A named, reachable caseworker</div><div class="d">A "who is my caseworker" field plus a direct line. The single most-cited difference between a one-star and a five-star experience.</div></div>
+    <div class="oc"><div class="lever">lever · trust</div><div class="t">"How we got this number"</div><div class="d">A plain-language explainer attached to every order and enforcement action, turning opacity into something a parent can see and accept.</div></div>
+    <div class="oc"><div class="lever">lever · voice</div><div class="t">Proactive status notifications</div><div class="d">Channel-chosen SMS/email for court dates, payments, and enforcement — so no one learns of a court date after it happened.</div></div>
+    <div class="oc"><div class="lever">lever · access</div><div class="t">Fee-free, mobile-first payment</div><div class="d">Fast-posting digital payment for unbanked parents — a pure-design fix to a pain point that <em>feels</em> structural.</div></div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">All four sit on the design side of the design-vs-policy line drawn at the macro level — they require no statutory change, only a decision to build them.</p>
+</div></section>
+
+  <!-- ===================== SOURCES ===================== -->
+<section id="sources" class="level" style="padding-bottom:0"><div class="wrap">
+  <div class="level-head reveal">
+    <div class="alt"><span class="lvlno">Method</span><span class="zoom">evidence base &amp; caveats</span></div>
+    <h2>Sources &amp; method note</h2>
+  </div>
+  <div class="src-block reveal">
+    <h4>Primary evidence base</h4>
+    <ul>
+      <li>Federal data: ACF / OCSS FY2024 Preliminary Data Tables (P-1 assistance reimbursement; P-29 collections by method; P-43–45 expenditure).</li>
+      <li>Legislative reference: CRS reports IF10113, RS22380, R47630 (program basics, structure, laws since 1950).</li>
+      <li>Census: P60-285 (child support receipt, 2022) and the 2017 receipt briefs.</li>
+      <li>Demonstrations & academic: MDRC PJAC (procedural justice); CSPED Final Impact Report (IRP, UW–Madison); Tyler's legitimacy / procedural-justice literature.</li>
+      <li>Reform & policy: the Abbell Report (Maryland reform); DC testimony on program improvement; "Directing Child Support to Families, Not Government" (CBPP) pass-through tables; Tollestrup & Thornton testimony, House Ways & Means, Jan 2026.</li>
+      <li>Statute: Georgia O.C.G.A. § 19-6-15.</li>
+      <li>External fill-ins (this report): NCSL / Justia / FindLaw on guideline models; CRS R47630 and the federal CSE Handbook on administration models and tribal programs.</li>
+    </ul>
+    <div class="flagnote"><strong>Verify-before-citing.</strong> A few of the punchiest figures originate in vendor (Deloitte Insights) marketing and are marked <span class="chip flag" style="vertical-align:middle">verify</span> in the text — e.g., "up to 70% of caseworkers re-enter the same data" and "about one-third of non-custodial parents don't earn enough to support themselves." Cross-check independently before using them in a graded or client deliverable.</div>
+    <p style="font-size:13.5px;color:var(--body);margin-top:16px;margin-bottom:0"><strong>Known gaps</strong> (worth naming in class): no original parent interviews yet — all emotional data is MDRC/CSPED research proxy; custodial-parent voice is under-represented in the applied research; no live state-portal UX audit has been run; and tribal-program lived experience has no dedicated source. These are the natural next moves into primary research.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="f">Child Support Journey Lab · System Log Report · v2 · Macro → Meso → Micro · Prepared for SCADpro Foundry × Deloitte GPS</div>
+</div></footer>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+    els.forEach(function(el){io.observe(el);});
+  } else { els.forEach(function(el){el.classList.add('in');}); }
+
+  var links=Array.prototype.slice.call(document.querySelectorAll('.anav a'));
+  var map={};
+  links.forEach(function(l){var id=l.getAttribute('href').slice(1);var s=document.getElementById(id);if(s)map[id]=s;});
+  function onScroll(){
+    var y=window.scrollY+90;var cur=null;
+    for(var id in map){ if(map[id].offsetTop<=y) cur=id; }
+    links.forEach(function(l){l.classList.toggle('on',l.getAttribute('href')==='#'+cur);});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+})();
+</script>
+</body>
+</html>
